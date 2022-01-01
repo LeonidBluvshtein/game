@@ -65,6 +65,9 @@ public class PlayerController {
             @RequestParam(defaultValue = "3") Integer pageSize
 
     ) {
+           System.out.println("In controller name = " + name);
+           System.out.println(name.length());
+           System.out.println("null". equalsIgnoreCase(name));
             return playerService.showAllPlayers(name, title, race, profession, after, before, banned, minExperience,
                     maxExperience, minLevel, maxLevel, pageNumber, pageSize, PlayerOrder.valueOf(order.toUpperCase())).getContent();
     }

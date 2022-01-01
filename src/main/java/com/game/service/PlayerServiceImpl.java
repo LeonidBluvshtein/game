@@ -33,12 +33,14 @@ public class PlayerServiceImpl implements PlayerService {
     public Page<Player> showAllPlayers(String name, String title, Race race, Profession profession, Long after,
                                        Long before, Boolean banned, Integer minExperience, Integer maxExperience,
                                        Integer minLevel, Integer maxLevel, Integer pageNumber, Integer pageSize, PlayerOrder order) {
-             return playerRepository.findAll(PageRequest.of(pageNumber, pageSize, Sort.by(order.getFieldName())));
+        System.out.println("In service name = " + name);
+             return playerRepository.findAll(PlayerSpecifications.getPlayersByNameLikeSpec(name),
+                     PageRequest.of(pageNumber, pageSize, Sort.by(order.getFieldName())));
     }
 
     public Long countAllPlayers(String name, String title, Race race, Profession profession, Long after,
                                        Long before, Boolean banned, Integer minExperience, Integer maxExperience,
                                        Integer minLevel, Integer maxLevel, Integer pageNumber, Integer pageSize, PlayerOrder order) {
-        return playerRepository.count();
+        return playerRepository.count(PlayerSpecifications.getPlayersByNameLikeSpec(name));
     }
 }

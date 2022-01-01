@@ -3,10 +3,7 @@ package com.game.service;
 import com.game.entity.Player;
 import org.springframework.data.jpa.domain.Specification;
 
-import javax.persistence.criteria.CriteriaBuilder;
-import javax.persistence.criteria.CriteriaQuery;
-import javax.persistence.criteria.Predicate;
-import javax.persistence.criteria.Root;
+import javax.persistence.criteria.*;
 
 public class PlayerSpecifications {
     public static Specification<Player> getPlayersByNameLikeSpec(String name) {
@@ -15,13 +12,13 @@ public class PlayerSpecifications {
             public Predicate toPredicate(Root<Player> root,
                                          CriteriaQuery<?> query,
                                          CriteriaBuilder criteriaBuilder) {
-                System.out.println("predicate");
-                Predicate nameLikePredicate;
-                if("null".equals(name)) {
-                    nameLikePredicate = criteriaBuilder.like(root.get("name"), "%");
-                    System.out.println("all");}
-                else nameLikePredicate = criteriaBuilder.like(root.get("name"), "%" + name + "%");
-                return nameLikePredicate;
+                System.out.println("In specification name = " + name);
+                if (name == null || name.length() == 0) {
+                    System.out.println("return from if");
+                    return criteriaBuilder.and();
+                }
+                System.out.println("after if");
+                return criteriaBuilder.like(root.get("name"), name);
             }
         };
     }
