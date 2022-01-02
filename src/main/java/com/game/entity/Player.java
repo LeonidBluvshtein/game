@@ -1,11 +1,13 @@
 package com.game.entity;
 
+
 import javax.persistence.*;
 import java.util.Date;
 
 @Entity(name= "player")
 public class Player {
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     Long id;
     String name;
     String title;

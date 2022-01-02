@@ -1,6 +1,7 @@
 package com.game.controller;
 
 import com.game.entity.Player;
+import com.game.entity.PlayerCreateDto;
 import com.game.entity.Profession;
 import com.game.entity.Race;
 import com.game.entity.exception.PlayerBadRequestException;
@@ -75,7 +76,7 @@ public class PlayerController {
     @ResponseBody
     public Player showPlayersById(@PathVariable String id) {
         if ("0".equals(id) || !checkId(id)) throw new PlayerBadRequestException();
-        Long idLong = 1l;
+        long idLong;
         Player p = null;
         try {
             idLong = Long.parseLong(id);
@@ -84,5 +85,10 @@ public class PlayerController {
             e.printStackTrace();
         }
         return p;
+    }
+
+    @PostMapping("/rest/players")
+    public Player createNewPlayer(@RequestBody PlayerCreateDto playerDto) {
+        return null;
     }
 }

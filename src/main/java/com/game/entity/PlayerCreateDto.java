@@ -1,23 +1,22 @@
 package com.game.entity;
 
-public class PlayerDto {
+public class PlayerCreateDto {
     Long id;
     String name;
     String title;
     Race race;
     Profession profession;
     Long birthday;
-
     Boolean banned;
     Integer experience;
     Integer level;
     Integer untilNextLevel;
 
-    public PlayerDto() {
+    public PlayerCreateDto() {
     }
 
-    public PlayerDto(Long id, String name, String title, Race race, Profession profession, Long birthday,
-                     Boolean banned, Integer experience, Integer level, Integer untilNextLevel) {
+    public PlayerCreateDto(Long id, String name, String title, Race race, Profession profession, Long birthday,
+                           Boolean banned, Integer experience, Integer level, Integer untilNextLevel) {
         this.id = id;
         this.name = name;
         this.title = title;
