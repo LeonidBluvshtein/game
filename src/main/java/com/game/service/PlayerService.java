@@ -7,13 +7,17 @@ import com.game.entity.Race;
 
 import org.springframework.data.domain.Page;
 
+import java.util.Optional;
+
 public interface PlayerService {
 
-  Page<Player> showAllPlayers(String name, String title, Race race, Profession profession, Long after, Long before,
-                               Boolean banned, Integer minExperience, Integer maxExperience, Integer minLevel,
-                               Integer maxLevel, Integer pageNumber, Integer pageSize, PlayerOrder order);
-
-    Long countAllPlayers(String name, String title, Race race, Profession profession, Long after, Long before,
+    Page<Player> showAllPlayers(String name, String title, Race race, Profession profession, Long after, Long before,
                                 Boolean banned, Integer minExperience, Integer maxExperience, Integer minLevel,
                                 Integer maxLevel, Integer pageNumber, Integer pageSize, PlayerOrder order);
+
+    Long countAllPlayers(String name, String title, Race race, Profession profession, Long after, Long before,
+                         Boolean banned, Integer minExperience, Integer maxExperience, Integer minLevel,
+                         Integer maxLevel, Integer pageNumber, Integer pageSize, PlayerOrder order);
+
+    Optional<Player> findPlayerById(Long id);
 }

@@ -16,6 +16,8 @@ import org.springframework.data.jpa.domain.Specification;
 
 import org.springframework.stereotype.Service;
 
+import java.util.Optional;
+
 
 @Service
 public class PlayerServiceImpl implements PlayerService {
@@ -62,5 +64,9 @@ public class PlayerServiceImpl implements PlayerService {
                                          .and(PlayerSpecifications.getPlayersByMaxExperienceSpec(maxExperience))
                                          .and(PlayerSpecifications.getPlayersByMinLevelSpec(minLevel))
                                          .and(PlayerSpecifications.getPlayersByMaxLevelSpec(maxLevel)));
+    }
+
+    public Optional<Player> findPlayerById(Long id) {
+        return playerRepository.findById(id);
     }
 }
