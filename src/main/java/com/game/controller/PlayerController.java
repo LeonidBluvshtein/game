@@ -10,11 +10,22 @@ import com.game.service.PlayerService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
+import java.time.ZoneOffset;
+import java.util.Date;
 import java.util.List;
 import java.util.regex.Pattern;
 
 @RestController
 public class PlayerController {
+    public static final int NAME_LENGTH = 12;
+    public static final int TITLE_LENGTH = 30;
+    public static final int MIN_EXPERIENCE = 0;
+    public static final int MAX_EXPERIENCE = 10_000_000;
+    public static final long EARLIEST_DATE = LocalDate.of(2000, 1, 1)
+                                                .atStartOfDay(ZoneOffset.UTC).toInstant().toEpochMilli();
+    public static final long LATEST_DATE = LocalDate.of(3000, 1, 1)
+                                                .atStartOfDay(ZoneOffset.UTC).toInstant().toEpochMilli();
     PlayerService playerService;
 
     @Autowired
@@ -22,7 +33,7 @@ public class PlayerController {
         this.playerService = playerService;
     }
 
-    public static boolean checkId(String id) {
+    private static boolean checkId(String id) {
         return Pattern.compile("[0-9]+").matcher(id).matches();
     }
 
@@ -75,12 +86,13 @@ public class PlayerController {
     @GetMapping("/rest/players/{id}")
     @ResponseBody
     public Player showPlayersById(@PathVariable String id) {
-        if ("0".equals(id) || !checkId(id)) throw new PlayerBadRequestException();
+        if (!checkId(id)) throw new PlayerBadRequestException();
         long idLong;
         Player p = null;
         try {
             idLong = Long.parseLong(id);
-            p = playerService.findPlayerById(idLong).orElseThrow(() -> new PlayerNotFoundException());
+            if(idLong == 0) throw new PlayerBadRequestException();
+            p = playerService.findPlayerById(idLong).orElseThrow(PlayerNotFoundException::new);
         } catch (NumberFormatException e) {
             e.printStackTrace();
         }
@@ -88,7 +100,31 @@ public class PlayerController {
     }
 
     @PostMapping("/rest/players")
-    public Player createNewPlayer(@RequestBody PlayerCreateDto playerDto) {
-        return null;
+    public Player createNewPlayer(@RequestBody PlayerCreateDto playerCreateDto) {
+    if(!checkName(playerCreateDto.getName())) throw new PlayerBadRequestException();
+    if(!checkTitle(playerCreateDto.getTitle())) throw new PlayerBadRequestException();
+    if(!checkExperience(playerCreateDto.getExperience())) throw new PlayerBadRequestException();
+    if(!checkBirthday(playerCreateDto.getBirthday())) throw new PlayerBadRequestException();
+    if(playerCreateDto.getBanned() == null) playerCreateDto.setBanned(false);
+    Player p = new Player(playerCreateDto.getName(), playerCreateDto.getTitle(), playerCreateDto.getRace(),
+            playerCreateDto.getProfession(), playerCreateDto.getExperience(), new Date(playerCreateDto.getBirthday()),
+            playerCreateDto.getBanned());
+    return playerService.createPlayer(p);
+    }
+
+    private static boolean checkName(String name) {
+        return name != null && name.trim().length() != 0 && name.length() <= NAME_LENGTH;
+    }
+
+    private static boolean checkTitle(String title) {
+        return title != null && title.trim().length() != 0 && title.length() <= TITLE_LENGTH;
+    }
+
+    private static boolean checkExperience(Integer experience) {
+        return experience != null && experience >= MIN_EXPERIENCE && experience <= MAX_EXPERIENCE;
+    }
+
+    private static boolean checkBirthday(Long birthday) {
+        return birthday != null && birthday >= EARLIEST_DATE && birthday < LATEST_DATE;
     }
 }

@@ -24,9 +24,8 @@ public class Player {
     public Player() {
     }
 
-    public Player(Long id, String name, String title, Race race, Profession profession,
+    public Player(String name, String title, Race race, Profession profession,
                   Integer experience, Date birthday, Boolean banned) {
-        this.id = id;
         this.name = name;
         this.title = title;
         this.race = race;
@@ -76,10 +75,6 @@ public class Player {
 
     public Boolean getBanned() {
         return banned;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
     }
 
     public void setName(String name) {

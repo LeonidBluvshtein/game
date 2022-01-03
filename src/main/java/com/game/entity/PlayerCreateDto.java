@@ -1,7 +1,7 @@
 package com.game.entity;
 
 public class PlayerCreateDto {
-    Long id;
+
     String name;
     String title;
     Race race;
@@ -9,15 +9,12 @@ public class PlayerCreateDto {
     Long birthday;
     Boolean banned;
     Integer experience;
-    Integer level;
-    Integer untilNextLevel;
 
     public PlayerCreateDto() {
     }
 
-    public PlayerCreateDto(Long id, String name, String title, Race race, Profession profession, Long birthday,
-                           Boolean banned, Integer experience, Integer level, Integer untilNextLevel) {
-        this.id = id;
+    public PlayerCreateDto(String name, String title, Race race, Profession profession, Long birthday,
+                           Boolean banned, Integer experience) {
         this.name = name;
         this.title = title;
         this.race = race;
@@ -25,16 +22,6 @@ public class PlayerCreateDto {
         this.birthday = birthday;
         this.banned = banned;
         this.experience = experience;
-        this.level = level;
-        this.untilNextLevel = untilNextLevel;
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
     }
 
     public String getName() {
@@ -91,21 +78,5 @@ public class PlayerCreateDto {
 
     public void setExperience(Integer experience) {
         this.experience = experience;
-    }
-
-    public Integer getLevel() {
-        return level;
-    }
-
-    public void setLevel(Integer level) {
-        this.level = level;
-    }
-
-    public Integer getUntilNextLevel() {
-        return untilNextLevel;
-    }
-
-    public void setUntilNextLevel(Integer untilNextLevel) {
-        this.untilNextLevel = untilNextLevel;
     }
 }

@@ -32,10 +32,6 @@ public class PlayerServiceImpl implements PlayerService {
     public Page<Player> showAllPlayers(String name, String title, Race race, Profession profession, Long after,
                                        Long before, Boolean banned, Integer minExperience, Integer maxExperience,
                                        Integer minLevel, Integer maxLevel, Integer pageNumber, Integer pageSize, PlayerOrder order) {
-        System.out.println("minExperience = " + minExperience);
-        System.out.println("maxExperience = " + maxExperience);
-        System.out.println("minLevel = " + minLevel);
-        System.out.println("maxLevel = " + maxLevel);
              return playerRepository.findAll(Specification.where(PlayerSpecifications.getPlayersByNameLikeSpec(name)
                                         .and(PlayerSpecifications.getPlayersByTitleLikeSpec(title))
                                         .and(PlayerSpecifications.getPlayersByRiceSpec(race))
@@ -68,5 +64,10 @@ public class PlayerServiceImpl implements PlayerService {
 
     public Optional<Player> findPlayerById(Long id) {
         return playerRepository.findById(id);
+    }
+
+    @Override
+    public Player createPlayer(Player p) {
+        return playerRepository.save(p);
     }
 }

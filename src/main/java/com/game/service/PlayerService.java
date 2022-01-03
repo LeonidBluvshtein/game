@@ -20,4 +20,6 @@ public interface PlayerService {
                          Integer maxLevel, Integer pageNumber, Integer pageSize, PlayerOrder order);
 
     Optional<Player> findPlayerById(Long id);
+
+    Player createPlayer(Player p);
 }
