@@ -34,7 +34,7 @@ public class PlayerController {
     }
 
     private static boolean checkId(String id) {
-        return Pattern.compile("[0-9]+").matcher(id).matches();
+        return !Pattern.compile("[0-9]+").matcher(id).matches();
     }
 
     @GetMapping("/rest/players/count")
@@ -86,7 +86,7 @@ public class PlayerController {
     @GetMapping("/rest/players/{id}")
     @ResponseBody
     public Player showPlayersById(@PathVariable String id) {
-        if (!checkId(id)) throw new PlayerBadRequestException();
+        if (checkId(id)) throw new PlayerBadRequestException();
         long idLong;
         Player p = null;
         try {
@@ -110,6 +110,20 @@ public class PlayerController {
             playerCreateDto.getProfession(), playerCreateDto.getExperience(), new Date(playerCreateDto.getBirthday()),
             playerCreateDto.getBanned());
     return playerService.createPlayer(p);
+    }
+
+    @DeleteMapping("/rest/players/{id}")
+    public void deletePlayer(@PathVariable String id) {
+        if (checkId(id)) throw new PlayerBadRequestException();
+        long idLong;
+        try {
+            idLong = Long.parseLong(id);
+            if(idLong == 0) throw new PlayerBadRequestException();
+            playerService.removePlayerById(idLong);
+        } catch (NumberFormatException e) {
+            e.printStackTrace();
+        }
+
     }
 
     private static boolean checkName(String name) {
