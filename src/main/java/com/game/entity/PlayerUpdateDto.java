@@ -1,7 +1,6 @@
 package com.game.entity;
 
-public class PlayerCreateDto {
-
+public class PlayerUpdateDto {
     private String name;
     private String title;
     private Race race;
@@ -10,10 +9,10 @@ public class PlayerCreateDto {
     private Boolean banned;
     private Integer experience;
 
-    public PlayerCreateDto() {
+    public PlayerUpdateDto() {
     }
 
-    public PlayerCreateDto(String name, String title, Race race, Profession profession, Long birthday,
+    public PlayerUpdateDto(String name, String title, Race race, Profession profession, Long birthday,
                            Boolean banned, Integer experience) {
         this.setName(name);
         this.setTitle(title);

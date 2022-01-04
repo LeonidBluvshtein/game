@@ -21,7 +21,7 @@ public interface PlayerService {
 
     Optional<Player> findPlayerById(Long id);
 
-    Player createPlayer(Player p);
+    Player createOrUpdatePlayer(Player player);
 
-    void removePlayerById(long id);
+    void removePlayer(Player player);
 }

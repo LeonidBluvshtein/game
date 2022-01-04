@@ -8,31 +8,31 @@ import java.util.Date;
 public class Player {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    Long id;
-    String name;
-    String title;
+    private Long id;
+    private String name;
+    private String title;
     @Enumerated(EnumType.STRING)
-    Race race;
+    private Race race;
     @Enumerated(EnumType.STRING)
-    Profession profession;
-    Integer experience; // Диапазон значений 0..10,000,000
-    Integer level;
-    Integer untilNextLevel;
-    Date birthday;  // Диапазон значений года 2000..3000 включительно
-    Boolean banned;
+    private Profession profession;
+    private Integer experience; // Диапазон значений 0..10,000,000
+    private Integer level;
+    private Integer untilNextLevel;
+    private Date birthday;  // Диапазон значений года 2000..3000 включительно
+    private Boolean banned;
 
     public Player() {
     }
 
-    public Player(String name, String title, Race race, Profession profession,
-                  Integer experience, Date birthday, Boolean banned) {
+    public Player(String name, String title, Race race, Profession profession, Integer experience,
+                  Date birthday, Boolean banned) {
         this.name = name;
         this.title = title;
         this.race = race;
         this.profession = profession;
         this.experience = experience;
-        level = calculateLevel();
-        untilNextLevel = calculateUntilNextLevel();
+        this.level = calculateLevel();
+        this.untilNextLevel = calculateUntilNextLevel();
         this.birthday = birthday;
         this.banned = banned;
     }
@@ -95,8 +95,8 @@ public class Player {
 
     public void setExperience(Integer experience) {
         this.experience = experience;
-        level = calculateLevel();
-        untilNextLevel = calculateUntilNextLevel();
+        this.level = calculateLevel();
+        this.untilNextLevel = calculateUntilNextLevel();
     }
 
     public void setBirthday(Date birthday) {
@@ -108,10 +108,10 @@ public class Player {
     }
 
     private Integer calculateLevel() {
-        return (int) ((Math.sqrt(2500 + 200 * experience) - 50) / 100);
+        return (int) ((Math.sqrt(2500 + 200 * getExperience()) - 50) / 100);
     }
 
     private Integer calculateUntilNextLevel() {
-        return 50 * (level + 1) * (level + 2) - experience;
+        return 50 * (getLevel() + 1) * (getLevel() + 2) - getExperience();
     }
 }

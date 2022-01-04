@@ -1,13 +1,11 @@
 package com.game.controller;
 
-import com.game.entity.Player;
-import com.game.entity.PlayerCreateDto;
-import com.game.entity.Profession;
-import com.game.entity.Race;
+import com.game.entity.*;
 import com.game.entity.exception.PlayerBadRequestException;
 import com.game.entity.exception.PlayerNotFoundException;
 import com.game.service.PlayerService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
@@ -23,9 +21,9 @@ public class PlayerController {
     public static final int MIN_EXPERIENCE = 0;
     public static final int MAX_EXPERIENCE = 10_000_000;
     public static final long EARLIEST_DATE = LocalDate.of(2000, 1, 1)
-                                                .atStartOfDay(ZoneOffset.UTC).toInstant().toEpochMilli();
+            .atStartOfDay(ZoneOffset.UTC).toInstant().toEpochMilli();
     public static final long LATEST_DATE = LocalDate.of(3000, 1, 1)
-                                                .atStartOfDay(ZoneOffset.UTC).toInstant().toEpochMilli();
+            .atStartOfDay(ZoneOffset.UTC).toInstant().toEpochMilli();
     PlayerService playerService;
 
     @Autowired
@@ -33,8 +31,11 @@ public class PlayerController {
         this.playerService = playerService;
     }
 
-    private static boolean checkId(String id) {
-        return !Pattern.compile("[0-9]+").matcher(id).matches();
+    private static long checkId(String id) {
+        if (!Pattern.compile("[0-9]+").matcher(id).matches()) throw new PlayerBadRequestException();
+        long playerId = Long.parseLong(id);
+        if (playerId == 0) throw new PlayerBadRequestException();
+        return playerId;
     }
 
     @GetMapping("/rest/players/count")
@@ -84,61 +85,87 @@ public class PlayerController {
     }
 
     @GetMapping("/rest/players/{id}")
-    @ResponseBody
     public Player showPlayersById(@PathVariable String id) {
-        if (checkId(id)) throw new PlayerBadRequestException();
-        long idLong;
-        Player p = null;
-        try {
-            idLong = Long.parseLong(id);
-            if(idLong == 0) throw new PlayerBadRequestException();
-            p = playerService.findPlayerById(idLong).orElseThrow(PlayerNotFoundException::new);
-        } catch (NumberFormatException e) {
-            e.printStackTrace();
-        }
-        return p;
+        return playerService.findPlayerById(checkId(id)).orElseThrow(PlayerNotFoundException::new);
     }
 
     @PostMapping("/rest/players")
     public Player createNewPlayer(@RequestBody PlayerCreateDto playerCreateDto) {
-    if(!checkName(playerCreateDto.getName())) throw new PlayerBadRequestException();
-    if(!checkTitle(playerCreateDto.getTitle())) throw new PlayerBadRequestException();
-    if(!checkExperience(playerCreateDto.getExperience())) throw new PlayerBadRequestException();
-    if(!checkBirthday(playerCreateDto.getBirthday())) throw new PlayerBadRequestException();
-    if(playerCreateDto.getBanned() == null) playerCreateDto.setBanned(false);
-    Player p = new Player(playerCreateDto.getName(), playerCreateDto.getTitle(), playerCreateDto.getRace(),
-            playerCreateDto.getProfession(), playerCreateDto.getExperience(), new Date(playerCreateDto.getBirthday()),
-            playerCreateDto.getBanned());
-    return playerService.createPlayer(p);
+        if (playerCreateDto.getName() == null || !checkName(playerCreateDto.getName())) {
+            throw new PlayerBadRequestException();
+        }
+        if (playerCreateDto.getTitle() == null || !checkTitle(playerCreateDto.getTitle())) {
+            throw new PlayerBadRequestException();
+        }
+        if (playerCreateDto.getExperience() == null || !checkExperience(playerCreateDto.getExperience())) {
+            throw new PlayerBadRequestException();
+        }
+        if (playerCreateDto.getBirthday() == null || !checkBirthday(playerCreateDto.getBirthday())) {
+            throw new PlayerBadRequestException();
+        }
+        if (playerCreateDto.getBanned() == null) playerCreateDto.setBanned(false);
+        Player p = new Player(playerCreateDto.getName(), playerCreateDto.getTitle(), playerCreateDto.getRace(),
+                playerCreateDto.getProfession(), playerCreateDto.getExperience(), new Date(playerCreateDto.getBirthday()),
+                playerCreateDto.getBanned());
+        return playerService.createOrUpdatePlayer(p);
     }
 
     @DeleteMapping("/rest/players/{id}")
+    @Transactional
     public void deletePlayer(@PathVariable String id) {
-        if (checkId(id)) throw new PlayerBadRequestException();
-        long idLong;
-        try {
-            idLong = Long.parseLong(id);
-            if(idLong == 0) throw new PlayerBadRequestException();
-            playerService.removePlayerById(idLong);
-        } catch (NumberFormatException e) {
-            e.printStackTrace();
-        }
+        Player player = playerService.findPlayerById(checkId(id)).orElseThrow(PlayerNotFoundException::new);
+        playerService.removePlayer(player);
+    }
 
+    @PostMapping("/rest/players/{id}")
+    @Transactional
+    public Player updatePlayer(@PathVariable String id, @RequestBody PlayerUpdateDto playerUpdateDto) {
+        Player player = playerService.findPlayerById(checkId(id)).orElseThrow(PlayerNotFoundException::new);
+        if (playerUpdateDto.getName() != null) {
+            if (checkName(playerUpdateDto.getName())) {
+                player.setName(playerUpdateDto.getName());
+            } else throw new PlayerBadRequestException();
+        }
+        if (playerUpdateDto.getTitle() != null) {
+            if (checkTitle(playerUpdateDto.getTitle())) {
+                player.setTitle(playerUpdateDto.getTitle());
+            } else throw new PlayerBadRequestException();
+        }
+        if (playerUpdateDto.getRace() != null) {
+            player.setRace(playerUpdateDto.getRace());
+        }
+        if (playerUpdateDto.getProfession() != null) {
+            player.setProfession(playerUpdateDto.getProfession());
+        }
+        if (playerUpdateDto.getExperience() != null) {
+            if (checkExperience(playerUpdateDto.getExperience())) {
+                player.setExperience(playerUpdateDto.getExperience());
+            } else throw new PlayerBadRequestException();
+        }
+        if (playerUpdateDto.getBirthday() != null) {
+            if (checkBirthday(playerUpdateDto.getBirthday())) {
+                player.setBirthday(new Date(playerUpdateDto.getBirthday()));
+            } else throw new PlayerBadRequestException();
+        }
+        if (playerUpdateDto.getBanned() != null) {
+            player.setBanned(playerUpdateDto.getBanned());
+        }
+        return playerService.createOrUpdatePlayer(player);
     }
 
     private static boolean checkName(String name) {
-        return name != null && name.trim().length() != 0 && name.length() <= NAME_LENGTH;
+        return name.trim().length() > 0 && name.length() <= NAME_LENGTH;
     }
 
     private static boolean checkTitle(String title) {
-        return title != null && title.trim().length() != 0 && title.length() <= TITLE_LENGTH;
+        return title.trim().length() > 0 && title.length() <= TITLE_LENGTH;
     }
 
     private static boolean checkExperience(Integer experience) {
-        return experience != null && experience >= MIN_EXPERIENCE && experience <= MAX_EXPERIENCE;
+        return experience >= MIN_EXPERIENCE && experience <= MAX_EXPERIENCE;
     }
 
     private static boolean checkBirthday(Long birthday) {
-        return birthday != null && birthday >= EARLIEST_DATE && birthday < LATEST_DATE;
+        return birthday >= EARLIEST_DATE && birthday < LATEST_DATE;
     }
 }

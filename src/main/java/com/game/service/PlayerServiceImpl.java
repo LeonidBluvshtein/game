@@ -69,14 +69,13 @@ public class PlayerServiceImpl implements PlayerService {
 
     @Override
     @Transactional
-    public Player createPlayer(Player p) {
-        return playerRepository.save(p);
+    public Player createOrUpdatePlayer(Player player) {
+        return playerRepository.save(player);
     }
 
     @Override
     @Transactional
-    public void removePlayerById(long id) {
-        Player p = playerRepository.findById(id).orElseThrow(PlayerNotFoundException::new);
-        playerRepository.delete(p);
+    public void removePlayer(Player player) {
+        playerRepository.delete(player);
     }
 }
